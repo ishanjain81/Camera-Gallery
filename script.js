@@ -28,14 +28,24 @@ navigator.mediaDevices.getUserMedia(constraints)
     });
     recorder.addEventListener("stop",(e)=>{
         // Conversion of media chunks data to video
-        console.log(chunks);
         let blob = new Blob(chunks,{type: "video/mp4"});
-        let videoURL = window.URL.createObjectURL(blob);
+        // let videoURL = window.URL.createObjectURL(blob);
 
-        let a = document.createElement("a");
-        a.href = videoURL;
-        a.download = "stream.mp4";
-        a.click();
+        if(db){
+            let videoId = shortid();
+            let dbTransaction = db.transaction("video","readwrite");
+            let videoStore = dbTransaction.objectStore("video");
+            let videoEntry = {
+                id: `vid-${videoId}`,
+                blobData: blob
+            };
+            videoStore.add(videoEntry);
+        }
+
+        // let a = document.createElement("a");
+        // a.href = videoURL;
+        // a.download = "stream.mp4";
+        // a.click();
     });
 });
 
@@ -57,6 +67,8 @@ recordBtnCont.addEventListener("click",(e)=>{
 });
 
 captureBtn.addEventListener("click",(e)=>{
+    captureBtn.classList.add("scale-capture");
+
     let canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -69,10 +81,25 @@ captureBtn.addEventListener("click",(e)=>{
     tool.fillRect(0,0,canvas.width,canvas.height);
 
     let imageURL = canvas.toDataURL();
-    let a = document.createElement("a");
-    a.href = imageURL;
-    a.download = "image.jpg";
-    a.click();
+
+    if(db){
+        let imageId = shortid();
+        let dbTransaction = db.transaction("image","readwrite");
+        let imageStore = dbTransaction.objectStore("image");
+        let imageEntry = {
+            id: `img-${imageId}`,
+            url: imageURL
+        };
+        imageStore.add(imageEntry);
+    }
+
+    // let a = document.createElement("a");
+    // a.href = imageURL;
+    // a.download = "image.jpg";
+    // a.click();
+    setTimeout(()=>{
+        captureBtn.classList.remove("scale-capture");
+    },500);
 });
 
 let timerId;

@@ -140,3 +140,13 @@ video{
     width: 100vw;
     z-index: 1;
 }
+
+.gallery{
+    color: white;
+    position: absolute;
+    right: 6rem;
+    bottom: 7rem;
+    font-size: 3rem;
+    cursor: pointer;
+    z-index: 2;
+}
